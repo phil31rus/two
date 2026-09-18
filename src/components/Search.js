@@ -9,6 +9,10 @@ class Search extends React.Component {
     }
 
     handleSearch = () => {
+        if (this.state.search.trim() === "") {
+            return;
+        }
+
         this.setState(
             { page: 1 },
             () => this.props.searchMovie(this.state.search, this.state.type, 1)
@@ -29,19 +33,23 @@ class Search extends React.Component {
     }
 
     prevPage = () => {
-        this.setState(
-            this.state.page > 1 ? { page: this.state.page - 1 } : { page: 1 },
-            () => this.props.searchMovie(this.state.search, this.state.type, this.state.page)
-        )
+        if (this.state.page > 1) {
+            this.setState(
+                { page: this.state.page - 1 },
+                () => this.props.searchMovie(this.state.search, this.state.type, this.state.page)
+            )
+        }
     }
 
     nextPage = () => {
         let total = Math.ceil(this.props.totalCount / 10);
-        this.setState(
-            this.state.page === total ? { page: total } :
+
+        if (this.state.page < total) {
+            this.setState(
                 { page: this.state.page + 1 },
-            () => this.props.searchMovie(this.state.search, this.state.type, this.state.page)
-        )
+                () => this.props.searchMovie(this.state.search, this.state.type, this.state.page)
+            )
+        }
     }
 
     setPage = (num) => {
@@ -63,51 +71,53 @@ class Search extends React.Component {
             mas.push(i);
         }
 
+        let knopki = mas.slice(firstIndex, lastIndex);
+
         return (
             <>
                 <div className="search">
                     <input
                         type="search"
-                        placeholder="Search"
+                        placeholder="Поиск фильма..."
                         value={this.state.search}
                         onChange={e => this.setState({ search: e.target.value })}
                         onKeyDown={this.handleKey}
                     />
-                    <button className="btn" onClick={this.handleSearch}>Search</button>
+                    <button className="btn" onClick={this.handleSearch}>Поиск</button>
                 </div>
+
                 <div className="radio">
                     <label htmlFor="all">
-                        <input type="radio" name="type" id="all" data-type="all" checked={this.state.type === "all"} onChange={this.handleFilter} /> All
+                        <input type="radio" name="type" id="all" data-type="all" checked={this.state.type === "all"} onChange={this.handleFilter} /> Все
                     </label>
                     <label htmlFor="movies">
-                        <input type="radio" name="type" id="movies" data-type="movie" checked={this.state.type === "movie"} onChange={this.handleFilter} /> Movies only
+                        <input type="radio" name="type" id="movies" data-type="movie" checked={this.state.type === "movie"} onChange={this.handleFilter} /> Фильмы
                     </label>
                     <label htmlFor="series">
-                        <input type="radio" name="type" id="series" data-type="series" checked={this.state.type === "series"} onChange={this.handleFilter} /> Series only
+                        <input type="radio" name="type" id="series" data-type="series" checked={this.state.type === "series"} onChange={this.handleFilter} /> Сериалы
                     </label>
                     <label htmlFor="games">
-                        <input type="radio" name="type" id="games" data-type="game" checked={this.state.type === "game"} onChange={this.handleFilter} /> Games only
+                        <input type="radio" name="type" id="games" data-type="game" checked={this.state.type === "game"} onChange={this.handleFilter} /> Игры
                     </label>
                 </div>
+
                 <div className="navigation">
-                    <button className="btn" onClick={this.prevPage} style={{ opacity: this.state.page === 1 ? ".5" : "1" }}>Prev</button>
+                    <button className="btn" onClick={this.prevPage} disabled={this.state.page === 1}>Назад</button>
 
                     <div className="items">
                         {
-                            mas
-                                .slice(firstIndex, lastIndex)
-                                .map((el, index) => (
-                                    <button
-                                        className="btn"
-                                        key={index}
-                                        style={{ background: this.state.page !== el ? "" : "gray" }}
-                                        onClick={() => this.setPage(el)}
-                                    >{el}</button>
-                                ))
+                            knopki.map((el, index) => (
+                                <button
+                                    className="btn"
+                                    key={index}
+                                    style={{ background: this.state.page !== el ? "" : "gray" }}
+                                    onClick={() => this.setPage(el)}
+                                >{el}</button>
+                            ))
                         }
                     </div>
 
-                    <button className="btn" onClick={this.nextPage} style={{ opacity: this.state.page === totalPage ? ".5" : "1" }}>Next</button>
+                    <button className="btn" onClick={this.nextPage} disabled={this.state.page === totalPage}>Вперёд</button>
                 </div>
             </>
         )

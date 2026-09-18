@@ -1,5 +1,16 @@
-.movies{
+.movies {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
+    padding: 20px 10px;
+    gap: 10px;
+}
+
+.movies h4 {
+    width: 100%;
+    text-align: center;
+    color: #888;
+    font-size: 20px;
+    padding: 40px 0;
+    font-weight: normal;
 }
